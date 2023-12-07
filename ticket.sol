@@ -1,8 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
-import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 
-contract EventTicket is ERC721{
+contract EventTicket{
 
     // Event info
     struct Section {
@@ -20,12 +19,12 @@ contract EventTicket is ERC721{
     // Minted tickets
     struct Ticket{
         uint256 sectionId;
+        address owner;
+        bool used;
     }
     Ticket[] public tickets;
-    uint256 public nextTicketId;
 
-
-    constructor(string memory name) ERC721("EventTicket", "ETK") {
+    constructor(string memory name) {
         owner = msg.sender;
         eventName = name;
         saleOpen = false;
@@ -59,25 +58,48 @@ contract EventTicket is ERC721{
 
     // End sale (withdraw)
     function endSale() public{
-        require(msg.sender == owner, "Only owner may start sale");
+        require(msg.sender == owner, "Only owner may end sale");
         require(saleOpen == true, "Needs to be on sale to end");
         saleOpen = false;
 
         payable(owner).transfer(address(this).balance);
     }
 
+    function getSections() public view returns (Section[] memory){
+        return sections;
+    }
+
+    function getTickets() public view returns (Ticket[] memory){
+        return tickets;
+    }
+
+    function verifyTicket(uint256 id) public view returns (bool){
+        require(tickets[id].owner == msg.sender, "Not owner of ticket");
+        require(tickets[id].used == false, "Ticket already used");
+        return true;
+    }
+
+    function checkIn(uint256 id) public{
+        require(tickets[id].owner == msg.sender, "Not ticket owner");
+        require(tickets[id].used == false, "Ticket already used");
+        
+        tickets[id].used = true;
+    }
+
     // Mint ticket
-    function mintTicket(uint256 sectionId) public payable {
+    function mintTicket(uint256 sectionId) external payable returns(uint256) {
         require(saleOpen == true, "Sale must be open");
-        require(sectionId < sections.length-1, "Section ID must be valid");
+        require(sectionId < sections.length, "Section ID must be valid");
         require(sections[sectionId].sold < sections[sectionId].num_tickets, "Section sold out");
         require(msg.value == sections[sectionId].price, "Full price of ticket must be paid");
 
         Ticket memory ticket;
         ticket.sectionId = sectionId;
+        ticket.owner = msg.sender;
         tickets.push(ticket);
-        uint256 ticketId = nextTicketId++;
+        sections[sectionId].num_tickets--;
+        sections[sectionId].sold++;
 
-        _safeMint(msg.sender, ticketId);
+        return tickets.length-1;
     }
 }
