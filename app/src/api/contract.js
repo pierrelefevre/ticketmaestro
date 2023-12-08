@@ -1,8 +1,10 @@
 import Web3 from "web3";
-import abi from "./assets/abi.json";
+import abi from "../assets/abi.json";
+import events from "../assets/events.json";
 
 const web3 = new Web3("https://sepolia.infura.io/v3/3f1d25df4ca94c788bbbebf8d2f3edaf");
-const contractAddress = "0x98C052036B69129E6007b50136b3DaA6E9A8c7a4";
+
+const contractAddress = events.events[0].contractAddress;
 const contract = new web3.eth.Contract(abi, contractAddress);
 
 // Function to buy a ticket
