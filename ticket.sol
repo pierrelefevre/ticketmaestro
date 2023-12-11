@@ -143,16 +143,17 @@ contract EventTicket {
         require(tickets[id].owner == msg.sender, "Not owner of ticket");
         require(tickets[id].used == false, "Ticket already used");
 
+        uint trans = tickets[id].sectionId;
+        sections[trans].num_tickets++;
+        sections[trans].sold--;
+
         // Remove ticket from tickets array
         for (uint i = id; i < tickets.length - 1; i++) {
             tickets[i] = tickets[i+1];
         }
         tickets.pop();
 
-        sections[tickets[id].sectionId].num_tickets++;
-        sections[tickets[id].sectionId].sold--;
-
         // Refund the ticket price to the ticket owner
-        payable(msg.sender).transfer(sections[tickets[id].sectionId].price);
+        payable(msg.sender).transfer(sections[trans].price);
     }
 }
