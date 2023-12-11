@@ -23,6 +23,7 @@ contract EventTicket {
         uint256 sectionId;
         address owner;
         bool used;
+        bool blocked;
     }
     Ticket[] public tickets;
 
@@ -46,9 +47,10 @@ contract EventTicket {
         require(msg.sender == owner, "Only owner may create sections");
         require(sectionPrice > 0, "Price must be a positive number (Wei)");
         require(num_tickets > 0, "Must sell at least one ticket per section");
+        require(maxTicketsPerPerson > 0, "The maximum ticket number per person must be at least one");
 
+        // Create new section
         Section memory newSection;
-
         newSection.name = sectionName;
         newSection.num_tickets = num_tickets;
         newSection.sold = 0;
@@ -87,12 +89,15 @@ contract EventTicket {
     function verifyTicket(uint256 id) public view returns (bool) {
         require(tickets[id].owner == msg.sender, "Not owner of ticket");
         require(tickets[id].used == false, "Ticket already used");
+        require(tickets[id].blocked == false, "Ticket already returned");
+
         return true;
     }
 
     function checkIn(uint256 id) public {
         require(tickets[id].owner == msg.sender, "Not ticket owner");
         require(tickets[id].used == false, "Ticket already used");
+        require(tickets[id].blocked == false, "Ticket already returned");
 
         tickets[id].used = true;
     }
@@ -113,12 +118,17 @@ contract EventTicket {
             "Maximum number of tickets already reached"
         );
 
+        // Create new ticket
         Ticket memory ticket;
         ticket.sectionId = sectionId;
         ticket.owner = msg.sender;
         tickets.push(ticket);
+
+        // Decrease the available number of tickets and increase the sold number
         sections[sectionId].num_tickets--;
         sections[sectionId].sold++;
+
+        // Increase the number of bought tickets
         ticketsPurchasedByBuyer[msg.sender]++;
 
         return tickets.length - 1;
@@ -141,13 +151,17 @@ contract EventTicket {
             "Maximum number of tickets already reached"
         );
 
-
+        // Create new ticket
         Ticket memory ticket;
         ticket.sectionId = sectionId;
         ticket.owner = otherPerson;
         tickets.push(ticket);
+
+        // Decrease the available number of tickets and increase the sold number
         sections[sectionId].num_tickets--;
         sections[sectionId].sold++;
+
+        // Increase the number of bought tickets
         ticketsPurchasedByBuyer[otherPerson]++;
 
         return tickets.length - 1;
@@ -159,21 +173,19 @@ contract EventTicket {
         require(id < tickets.length, "Invalid ticket ID");
         require(tickets[id].owner == msg.sender, "Not owner of ticket");
         require(tickets[id].used == false, "Ticket already used");
+        require(tickets[id].blocked == false, "Ticket already returned");
 
-        uint trans = tickets[id].sectionId;
-        sections[trans].num_tickets++;
-        sections[trans].sold--;
+        // Mark ticket as blocked in the array
+        tickets[id].blocked = true;
 
-        // Remove ticket from tickets array
-        for (uint i = id; i < tickets.length - 1; i++) {
-            tickets[i] = tickets[i+1];
-        }
-        tickets.pop();
+        // Increase the available number of tickets and decrease the sold number
+        sections[tickets[id].sectionId].num_tickets++;
+        sections[tickets[id].sectionId].sold--;
 
         // Refund the ticket price to the ticket owner
-        payable(msg.sender).transfer(sections[trans].price);
+        payable(msg.sender).transfer(sections[tickets[id].sectionId].price);
 
-        // Update the ticketsPurchasedByBuyer mapping
+        // Decrease the number of bought tickets
         ticketsPurchasedByBuyer[msg.sender]--;
     }
 }
