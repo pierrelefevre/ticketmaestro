@@ -1,7 +1,15 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-contract EventTicket {
+//import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
+//import "@openzeppelin/contracts/access/Ownable.sol";
+import "https://github.com/0xcert/ethereum-erc721/src/contracts/tokens/nf-token-metadata.sol";
+import "https://github.com/0xcert/ethereum-erc721/src/contracts/ownership/ownable.sol";
+import "@openzeppelin/contracts/utils/Strings.sol";
+
+//contract newNFT is NFTokenMetadata, Ownable {
+
+contract EventTicket is NFTokenMetadata, Ownable {
     // Event info
     struct Section {
         string name;
@@ -9,7 +17,7 @@ contract EventTicket {
         uint256 sold;
         uint256 price;
     }
-    address public owner;
+    //address public owner;
     string public eventName;
     Section[] public sections;
     bool public saleOpen;
@@ -26,6 +34,8 @@ contract EventTicket {
         owner = msg.sender;
         eventName = name;
         saleOpen = false;
+        nftName = "SectionTest NFT";
+        nftSymbol = "STNF";
     }
 
     // Create section
@@ -91,7 +101,7 @@ contract EventTicket {
         tickets[id].used = true;
     }
 
-    function buyTicket(uint256 sectionId) external payable returns (uint256) {
+    function buyTicket(uint256 sectionId, uint256 tokenId) external payable returns (uint256) {
         require(saleOpen == true, "Sale must be open");
         require(sectionId < sections.length, "Section ID must be valid");
         require(
@@ -109,6 +119,11 @@ contract EventTicket {
         tickets.push(ticket);
         sections[sectionId].num_tickets--;
         sections[sectionId].sold++;
+
+        // Mint NFTs (QR code that contains the number of the sold ticket (first = 1 etc.))
+        string memory soldToString = Strings.toString(sections[sectionId].sold);
+        super._mint(msg.sender, tokenId);
+        super._setTokenUri(tokenId, string.concat("https://qrcode.tec-it.com/API/QRCode?data=", "-", soldToString));
 
         return tickets.length - 1;
     }
