@@ -8,7 +8,11 @@ contract EventTicket {
         uint256 num_tickets;
         uint256 sold;
         uint256 price;
+        uint256 ticketLimit;
     }
+
+    mapping(address => uint256) public ticketsPurchasedByBuyer;  // New mapping to track tickets purchased by each buyer
+
     address public owner;
     string public eventName;
     Section[] public sections;
@@ -32,7 +36,8 @@ contract EventTicket {
     function createSection(
         string memory sectionName,
         uint256 num_tickets,
-        uint256 sectionPrice
+        uint256 sectionPrice,
+        uint256 maxTicketsPerPerson
     ) public {
         require(
             saleOpen == false,
@@ -48,6 +53,7 @@ contract EventTicket {
         newSection.num_tickets = num_tickets;
         newSection.sold = 0;
         newSection.price = sectionPrice;
+        newSection.ticketLimit = maxTicketsPerPerson;
 
         sections.push(newSection);
     }
@@ -102,6 +108,10 @@ contract EventTicket {
             msg.value == sections[sectionId].price,
             "Full price of ticket must be paid"
         );
+        require(
+            ticketsPurchasedByBuyer[msg.sender] + 1 <= sections[sectionId].ticketLimit,
+            "Maximum number of tickets already reached"
+        );
 
         Ticket memory ticket;
         ticket.sectionId = sectionId;
@@ -109,6 +119,7 @@ contract EventTicket {
         tickets.push(ticket);
         sections[sectionId].num_tickets--;
         sections[sectionId].sold++;
+        ticketsPurchasedByBuyer[msg.sender]++;
 
         return tickets.length - 1;
     }
@@ -125,6 +136,11 @@ contract EventTicket {
             msg.value == sections[sectionId].price,
             "Full price of ticket must be paid"
         );
+        require(
+            ticketsPurchasedByBuyer[otherPerson] + 1 <= sections[sectionId].ticketLimit,
+            "Maximum number of tickets already reached"
+        );
+
 
         Ticket memory ticket;
         ticket.sectionId = sectionId;
@@ -132,6 +148,7 @@ contract EventTicket {
         tickets.push(ticket);
         sections[sectionId].num_tickets--;
         sections[sectionId].sold++;
+        ticketsPurchasedByBuyer[otherPerson]++;
 
         return tickets.length - 1;
     }
@@ -155,5 +172,8 @@ contract EventTicket {
 
         // Refund the ticket price to the ticket owner
         payable(msg.sender).transfer(sections[trans].price);
+
+        // Update the ticketsPurchasedByBuyer mapping
+        ticketsPurchasedByBuyer[msg.sender]--;
     }
 }
