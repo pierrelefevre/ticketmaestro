@@ -8,6 +8,7 @@ import {
   CardHeader,
   TextField,
 } from "@mui/material";
+import Web3 from "web3";
 
 const Tickets = ({ setCurrentTab }) => {
   const [contract, setContract] = useState(null);
@@ -54,7 +55,7 @@ const Tickets = ({ setCurrentTab }) => {
           <CardContent>
             <p>{section.num_tickets + " available"}</p>
             <p>{section.sold + " sold"}</p>
-            <p>{section.price + " Wei"}</p>
+            <p>{Web3.utils.fromWei(section.price, 'ether') + " ETH"}</p>
           </CardContent>
           <CardActions>
             <TextField
