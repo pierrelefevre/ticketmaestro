@@ -1,4 +1,4 @@
-name: solidity-compile
+name: solidity-test
 "on":
   push:
     branches:
@@ -26,3 +26,6 @@ jobs:
 
       - name: Compile Solidity
         run: truffle compile
+
+      - name: Test Solidity
+        run: truffle test
