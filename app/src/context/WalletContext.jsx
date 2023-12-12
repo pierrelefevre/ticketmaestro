@@ -1,4 +1,4 @@
-import { useEffect, useState, createContext } from "react";
+import { useState, createContext } from "react";
 
 const initialState = {
   account: [],
@@ -26,13 +26,6 @@ export const WalletContextProvider = ({ children }) => {
       alert("Please install MetaMask to use this feature!");
     }
   };
-
-  useEffect(() => {
-    if (!account) {
-      connectWallet();
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
 
   return (
     <WalletContext.Provider

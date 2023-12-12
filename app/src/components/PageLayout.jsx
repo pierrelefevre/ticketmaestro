@@ -16,6 +16,7 @@ import Iconify from "./Iconify";
 import Events from "./EventsTab";
 import Tickets from "./Tickets";
 import Manage from "./Manage";
+import OpenApp from "react-open-app";
 
 const PageLayout = () => {
   const [currentTab, setCurrentTab] = useState(0);
@@ -48,7 +49,7 @@ const PageLayout = () => {
                 display: { xs: "none", sm: "none", md: "inline" },
               }}
             >
-              TicketApprentice
+              TicketMaestro
             </Typography>
 
             {account ? (
@@ -74,14 +75,36 @@ const PageLayout = () => {
                 />
               </Tabs>
             ) : (
-              <Button
-                variant="contained"
-                color="inherit"
-                onClick={connectWallet}
-                startIcon={<Iconify icon="logos:metamask-icon" />}
-              >
-                Login with MetaMask
-              </Button>
+              <>
+                {!window.navigator.userAgent.includes("MetaMaskMobile") && (
+                  <OpenApp
+                    ios="https://metamask.app.link/dapp/ticket.app.cloud.cbh.kth.se/"
+                    android="https://metamask.app.link/dapp/ticket.app.cloud.cbh.kth.se/"
+                  >
+                    <Button
+                      variant="contained"
+                      startIcon={<Iconify icon="logos:metamask-icon" />}
+                      sx={{
+                        display: { xs: "inline", sm: "none", md: "none" },
+                        textDecoration: "none",
+                      }}
+                    >
+                      Open in MetaMask
+                    </Button>
+                  </OpenApp>
+                )}
+                <Button
+                  variant="contained"
+                  color="inherit"
+                  onClick={connectWallet}
+                  startIcon={<Iconify icon="logos:metamask-icon" />}
+                  sx={{
+                    display: { xs: "none", sm: "inherit", md: "inherit" },
+                  }}
+                >
+                  Login with MetaMask
+                </Button>
+              </>
             )}
           </Toolbar>
         </AppBar>
