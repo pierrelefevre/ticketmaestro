@@ -1,6 +1,6 @@
 # 🎟️ ticketmaestro/api
 
-## A very rudiementary API
+## A very rudimentary API
 The API is intended to keep track of the currently deployed TicketMaestro contracts.
 
 ## Endpoints
