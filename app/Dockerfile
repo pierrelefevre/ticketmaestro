@@ -4,9 +4,9 @@ ENV PATH /app/node_modules/.bin:$PATH
 ENV CHOKIDAR_USEPOLLING=true
 
 
-COPY ./package.json /app/
-COPY ./package-lock.json /app/
-COPY . /app
+COPY ./app/package.json /app/
+COPY ./app/package-lock.json /app/
+COPY ./app /app
 
 RUN npm install
 RUN npm run build
