@@ -1,4 +1,4 @@
-import { useState, createContext } from "react";
+import { useState, createContext, useEffect } from "react";
 
 const initialState = {
   account: [],
@@ -23,9 +23,14 @@ export const WalletContextProvider = ({ children }) => {
         console.error("Error connecting to MetaMask", error);
       }
     } else {
-      alert("Please install MetaMask to use this feature!");
+      console.log("Could not find window.ethereum");
     }
   };
+
+  useEffect(() => {
+    connectWallet();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <WalletContext.Provider

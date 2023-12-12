@@ -1,5 +1,4 @@
 import { useState } from "react";
-// import { buyTicket, checkIn, getOwner } from "../api/contract";
 import useWallet from "../hooks/useWallet";
 import {
   AppBar,
@@ -22,6 +21,7 @@ const PageLayout = () => {
   const [currentTab, setCurrentTab] = useState(0);
 
   const { account, connectWallet } = useWallet();
+
 
   return (
     <>
@@ -93,13 +93,18 @@ const PageLayout = () => {
                     </Button>
                   </OpenApp>
                 )}
+
                 <Button
                   variant="contained"
                   color="inherit"
                   onClick={connectWallet}
                   startIcon={<Iconify icon="logos:metamask-icon" />}
                   sx={{
-                    display: { xs: "none", sm: "inherit", md: "inherit" },
+                    display: window.navigator.userAgent.includes(
+                      "MetaMaskMobile"
+                    )
+                      ? "inherit"
+                      : { xs: "none", sm: "inherit", md: "inherit" },
                   }}
                 >
                   Login with MetaMask
@@ -110,22 +115,11 @@ const PageLayout = () => {
         </AppBar>
       </Box>
       <Container sx={{ p: 5 }}>
-        {currentTab === 0 && <Events />}
+        {currentTab === 0 && <Events setCurrentTab={setCurrentTab} />}
 
-        {currentTab === 1 && <Tickets />}
+        {currentTab === 1 && <Tickets setCurrentTab={setCurrentTab} />}
 
         {currentTab === 2 && <Manage />}
-
-        {/* <Button onClick={() => buyTicket(1, account)}>Buy Ticket</Button>
-        <Button onClick={() => checkIn(1, account)}>Check In</Button>
-        <Button
-          onClick={async () => {
-            let o = await getOwner(account);
-            console.log(o);
-          }}
-        >
-          Get Owner
-        </Button> */}
       </Container>
     </>
   );

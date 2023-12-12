@@ -9,8 +9,17 @@ import {
 
 import events from "../assets/events.json";
 
-const EventsTab = () => {
+const EventsTab = ({ setCurrentTab }) => {
   console.log(events);
+
+  const handleBuyTickets = (event) => {
+    // push contract address to url
+    window.history.pushState({}, "", "/?contract=" + event.contractAddress);
+
+    // switch to tickets tab
+    setCurrentTab(1);
+  };
+
   return (
     <>
       <Card sx={{ mb: 5 }}>
@@ -33,7 +42,7 @@ const EventsTab = () => {
             <p>{event.contractAddress}</p>
           </CardContent>
           <CardActions>
-            <Button>Buy tickets</Button>
+            <Button onClick={() => handleBuyTickets(event)}>Buy tickets</Button>
           </CardActions>
         </Card>
       ))}
