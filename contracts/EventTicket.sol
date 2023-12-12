@@ -185,7 +185,7 @@ contract EventTicket {
 
         // Mark ticket as blocked in the array
         tickets[id].blocked = true;
-#?¤"=)#¤?=)"#¤?=
+
         // Increase the available number of tickets and decrease the sold number
         sections[tickets[id].sectionId].num_tickets++;
         sections[tickets[id].sectionId].sold--;
