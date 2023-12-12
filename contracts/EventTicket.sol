@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.0;
+pragma solidity >=0.4.22 <0.9.0;
 
 contract EventTicket {
     // Event info
@@ -11,7 +11,7 @@ contract EventTicket {
         uint256 ticketLimit;
     }
 
-    mapping(address => uint256) public ticketsPurchasedByBuyer;  // New mapping to track tickets purchased by each buyer
+    mapping(address => uint256) public ticketsPurchasedByBuyer; // New mapping to track tickets purchased by each buyer
 
     address public owner;
     string public eventName;
@@ -47,7 +47,10 @@ contract EventTicket {
         require(msg.sender == owner, "Only owner may create sections");
         require(sectionPrice > 0, "Price must be a positive number (Wei)");
         require(num_tickets > 0, "Must sell at least one ticket per section");
-        require(maxTicketsPerPerson > 0, "The maximum ticket number per person must be at least one");
+        require(
+            maxTicketsPerPerson > 0,
+            "The maximum ticket number per person must be at least one"
+        );
 
         // Create new section
         Section memory newSection;
@@ -114,7 +117,8 @@ contract EventTicket {
             "Full price of ticket must be paid"
         );
         require(
-            ticketsPurchasedByBuyer[msg.sender] + 1 <= sections[sectionId].ticketLimit,
+            ticketsPurchasedByBuyer[msg.sender] + 1 <=
+                sections[sectionId].ticketLimit,
             "Maximum number of tickets already reached"
         );
 
@@ -135,7 +139,10 @@ contract EventTicket {
     }
 
     // Buy ticket for another person
-    function buyTicketForOtherPerson(uint256 sectionId, address otherPerson) external payable returns (uint256) {
+    function buyTicketForOtherPerson(
+        uint256 sectionId,
+        address otherPerson
+    ) external payable returns (uint256) {
         require(saleOpen == true, "Sale must be open");
         require(sectionId < sections.length, "Section ID must be valid");
         require(
@@ -147,7 +154,8 @@ contract EventTicket {
             "Full price of ticket must be paid"
         );
         require(
-            ticketsPurchasedByBuyer[otherPerson] + 1 <= sections[sectionId].ticketLimit,
+            ticketsPurchasedByBuyer[otherPerson] + 1 <=
+                sections[sectionId].ticketLimit,
             "Maximum number of tickets already reached"
         );
 
@@ -168,7 +176,7 @@ contract EventTicket {
     }
 
     // Return an own ticket
-     function returnTicket(uint256 id) public {
+    function returnTicket(uint256 id) public {
         require(saleOpen == true, "Sale must be open");
         require(id < tickets.length, "Invalid ticket ID");
         require(tickets[id].owner == msg.sender, "Not owner of ticket");
