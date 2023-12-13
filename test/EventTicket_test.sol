@@ -13,7 +13,7 @@ import "../contracts/EventTicket.sol";
 // File name has to end with '_test.sol', this file can contain more than one testSuite contracts
 contract testSuite {
 
-    function beforeEach() public {
+    function beforeAll() public {
         // This function is executed before each test case
         EventTicket eventTicket = new EventTicket("Test Event");
         eventTicket.createSection("VIP", 100, 1 wei, 10);
