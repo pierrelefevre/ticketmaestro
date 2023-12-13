@@ -89,8 +89,8 @@ const Navbar = () => {
           <>
             {!window.navigator.userAgent.includes("MetaMaskMobile") && (
               <OpenApp
-                ios="https://metamask.app.link/dapp/ticket.app.cloud.cbh.kth.se/"
-                android="https://metamask.app.link/dapp/ticket.app.cloud.cbh.kth.se/"
+                ios="https://metamask.app.link/dapp/ticketmaestro.fun/"
+                android="https://metamask.app.link/dapp/ticketmaestro.fun/"
               >
                 <Button
                   variant="contained"
