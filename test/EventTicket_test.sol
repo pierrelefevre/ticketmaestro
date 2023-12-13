@@ -18,7 +18,7 @@ contract testSuite {
         EventTicket eventTicket = new EventTicket("Test Event");
         eventTicket.createSection("VIP", 100, 1 wei, 10);
         eventTicket.startSale();
-        isOpen = eventTicket.saleOpen();
+        bool isOpen = eventTicket.saleOpen();
         Assert.equal(isOpen, true, "Sale should be open");
     }
     /*
