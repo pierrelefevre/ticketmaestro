@@ -78,7 +78,20 @@ contract EventTicket {
         require(saleOpen == true, "Needs to be on sale to end");
         saleOpen = false;
 
+        //payable(owner).transfer(address(this).balance);
+    }
+
+    function withdrawFunds() public {
+        require(msg.sender == owner, "Only owner can withdraw funds");
+        require(saleOpen == false, "Sale needs to be closed");
+
         payable(owner).transfer(address(this).balance);
+    }
+
+    function getContractBalance() public view returns (uint256) {
+        require(msg.sender == owner, "Only owner may retrieve the funds");
+        require(saleOpen == false, "Sell needs to be finished");
+        return address(this).balance;
     }
 
     function getSections() public view returns (Section[] memory) {
@@ -97,7 +110,7 @@ contract EventTicket {
         return true;
     }
 
-    function checkIn(uint256 id) public {
+    function checke(uint256 id) public {
         require(tickets[id].owner == msg.sender, "Not ticket owner");
         require(tickets[id].used == false, "Ticket already used");
         require(tickets[id].blocked == false, "Ticket already returned");
@@ -191,9 +204,17 @@ contract EventTicket {
         sections[tickets[id].sectionId].sold--;
 
         // Refund the ticket price to the ticket owner
-        payable(msg.sender).transfer(sections[tickets[id].sectionId].price);
+        //payable(msg.sender).transfer(sections[tickets[id].sectionId].price);
+
+        // Refund the ticket price to the ticket owner
+        uint256 refundAmount = sections[tickets[id].sectionId].price;
+
+        // Emit an event to notify the client application of the refund
+        emit TicketRefunded(msg.sender, refundAmount);
 
         // Decrease the number of bought tickets
         ticketsPurchasedByBuyer[msg.sender]--;
     }
+
+    event TicketRefunded(address indexed ticketOwner, uint256 refundAmount);
 }
