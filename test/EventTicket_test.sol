@@ -4,19 +4,22 @@ pragma solidity >=0.4.22 <0.9.0;
 
 // This import is automatically injected by Remix
 import "./remix_tests.sol";
+import "./remix_accounts.sol";
 
 // This import is required to use custom transaction context
 // Although it may fail compilation in 'Solidity Compiler' plugin
 // But it will work fine in 'Solidity Unit Testing' plugin
 import "../contracts/EventTicket.sol";
 
+function beforeAll() public {
+        EventTicket eventTicket = new EventTicket("Test Event");
+    }
+
 // File name has to end with '_test.sol', this file can contain more than one testSuite contracts
 contract testSuite {
     /*
     // test createSection
     function testCreateSection() public {
-        EventTicket eventTicket = new EventTicket("Test Event");
-
         // Test one easy section
         eventTicket.createSection("VIP", 1000, 100 wei, 10);
         EventTicket.Section[] memory sections = eventTicket.getSections();
@@ -35,7 +38,6 @@ contract testSuite {
 */
     // test startSale and endSale
     function testStartSaleAndEndSale() public {
-        EventTicket eventTicket = new EventTicket("Test Event");
 
         // Check whether the sale is open before startSale
         eventTicket.createSection("VIP", 100, 1 wei, 5);
@@ -71,7 +73,6 @@ contract testSuite {
 
     // test returnTicket
     function testReturnTicket() public payable {
-        EventTicket eventTicket = new EventTicket("Test Event");
 
         eventTicket.createSection("VIP", 5, 1 wei, 5);
 
