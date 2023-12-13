@@ -6,15 +6,7 @@
             "imageUrl": "https://wallpaper-of-the-day.app.cloud.cbh.kth.se/",
             "description": "Taylor swift is coming to town!",
             "location": "Stockholm, Sweden",
-            "date": "2019-12-24T23:00:00.000Z"
-        },
-        {
-            "contractAddress": "0x98C052036B69129E6007b50136b3DaA6E9A8c7a4",
-            "name": "Taylor Swift the second",
-            "imageUrl": "https://wallpaper-of-the-day.app.cloud.cbh.kth.se/",
-            "description": "Taylor swift is coming to town again!",
-            "location": "Stockholm, Stockholm",
-            "date": "2019-12-24T23:00:00.000Z"
+            "date": "2023-12-24T23:00:00.000Z"
         }
     ]
 }
