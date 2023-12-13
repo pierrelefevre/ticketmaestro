@@ -34,7 +34,7 @@ const PurchaseTab = () => {
 
     if (!contractAddress) {
       alert("Contract not found");
-      navigate("/")
+      navigate("/");
     }
 
     setAddress(contractAddress);
@@ -90,6 +90,10 @@ const PurchaseTab = () => {
 
   return (
     <>
+      <Typography variant="h3" gutterBottom sx={{ mb: 5 }}>
+        Checkout
+      </Typography>
+
       {event && (
         <Card sx={{ mb: 5 }}>
           {event.imageUrl && (

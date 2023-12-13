@@ -38,7 +38,9 @@ const TicketsTab = () => {
 
   return (
     <>
-      <h1>Your tickets</h1>
+      <Typography variant="h3" gutterBottom sx={{ mb: 5 }}>
+        Your tickets
+      </Typography>
       {tickets.length === 0 && <LinearProgress />}
 
       <Grid container spacing={2}>

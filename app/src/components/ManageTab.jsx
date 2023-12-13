@@ -95,7 +95,9 @@ const ManageTab = () => {
 
   return (
     <>
-      <h1>Your events</h1>
+      <Typography variant="h3" gutterBottom sx={{ mb: 5 }}>
+        Your events
+      </Typography>
       {owned.length === 0 && <LinearProgress />}
 
       <Grid container spacing={2}>

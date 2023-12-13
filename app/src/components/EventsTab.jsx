@@ -19,18 +19,13 @@ const EventsTab = () => {
 
   return (
     <>
-      <Card sx={{ mb: 5 }}>
-        <CardMedia sx={{ height: 300 }} image="landing.png" />
-        <CardContent>
-          <h1>Event tickets - on chain!</h1>
-          <p>
-            This is a demo for ticketing using the Ethereum blockchain to store
-            tickets and events.
-          </p>
-        </CardContent>
-      </Card>
-
-      <h2>Upcoming events</h2>
+      <Typography
+        variant={"h3"}
+        gutterBottom
+        sx={{ mb: 5, fontSize: { xs: "2.5rem", md: "3rem" } }}
+      >
+        Upcoming events
+      </Typography>
       {events && events.length === 0 ? (
         <LinearProgress />
       ) : (
