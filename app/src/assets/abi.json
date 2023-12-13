@@ -11,7 +11,7 @@
 		"outputs": [
 			{
 				"internalType": "uint256",
-				"name": "",
+				"name": "ticketId",
 				"type": "uint256"
 			}
 		],
