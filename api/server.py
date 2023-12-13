@@ -1,5 +1,9 @@
 import json
 import flask
+from flask_cors import CORS
+
+app = flask.Flask(__name__)
+CORS(app)
 
 
 def read_file():
@@ -11,9 +15,6 @@ def read_file():
 def write_file(data):
     with open("events.json", "w") as f:
         json.dump(data, f, indent=4)
-
-
-app = flask.Flask(__name__)
 
 
 @app.route("/", methods=["GET"])
