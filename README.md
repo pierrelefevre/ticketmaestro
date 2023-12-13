@@ -3,6 +3,7 @@ Event tickets on the Ethereum blockchain
 
 A project by Robert Scholz and Pierre Le Fevre, built in the context of the KTH DD2485 Programmable Society course.
 
+![logo](./app/public/android-chrome-192x192.png)
 
 ## Contract breakdown
 
