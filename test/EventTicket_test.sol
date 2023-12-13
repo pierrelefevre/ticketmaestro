@@ -15,7 +15,7 @@ contract testSuite {
 
     function beforeEach() public {
         // This function is executed before each test case
-        eventTicket = new EventTicket("Test Event");
+        EventTicket eventTicket = new EventTicket("Test Event");
         eventTicket.createSection("VIP", 100, 1 wei, 10);
         eventTicket.startSale();
         isOpen = eventTicket.saleOpen();
