@@ -8,7 +8,7 @@
 - [ ] (BONUS) perfect testing: the protocol has 100% statement coverage	Yes	No
 - [ ] sota: There is one good slide positioning the presentation in the state of the art	Yes	No
 - [ ] (BONUS) DApp/UX: the protocol contains user interface application	Yes	No
-- [ ] 
+
 ## Todo
 - [ ] documented: The usage of the protocol is well documented	Mandatory	-
 - [ ] code: The presentation contains valuable and readable code snippets	Yes	No
