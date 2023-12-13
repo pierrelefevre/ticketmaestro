@@ -52,6 +52,9 @@ def api_add():
     if "location" not in new:
         return "Missing location", 400
 
+    if "date" not in new:
+        return "Missing date", 400
+
     data["events"].append(new)
     write_file(data)
     return flask.request.json
