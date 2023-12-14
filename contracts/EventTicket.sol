@@ -82,7 +82,7 @@ contract EventTicket {
         require(tickets[id].blocked == false, "Ticket already returned");
         return true;
     }
-    function checkIn(uint256 id) public onlyOwner {
+    function checkIn(uint256 id) public {
         require(msg.sender == owner, "Only owner can perform this action");
         require(tickets[id].used == false, "Ticket already used");
         require(tickets[id].blocked == false, "Ticket already returned");
