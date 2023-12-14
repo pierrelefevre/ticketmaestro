@@ -58,7 +58,7 @@ contract('EventTicket', (accounts) => {
     it('should not create a section during sale', async () => {
         const eventTicket = await EventTicket.new('Test Event');
 
-        await eventTicket.createSection('VIP', 1000, 0, 10);
+        await eventTicket.createSection('VIP', 1000, 1, 10);
 
         await eventTicket.startSale();
 
@@ -183,7 +183,7 @@ contract('EventTicket', (accounts) => {
             assert.fail('Should have thrown an exception');
         } catch (error) {
             const isOpen = await eventTicket.saleOpen();
-            assert.equal(isOpen, true, 'Sale should be closed');
+            assert.equal(isOpen, false, 'Sale should be closed');
         }
     });
 
@@ -426,6 +426,212 @@ contract('EventTicket', (accounts) => {
             const tickets = await eventTicket.getTickets();
             assert.equal(tickets.length, 1, 'Either both tickets have not been bought or both have been bought');
             assert.equal(tickets[0].owner, accounts[0], 'Wrong ticket owner on the test contract');
+        }
+    });
+
+    it('should return a ticket', async () => {
+        const eventTicket = await EventTicket.new('Test Event');
+
+        await eventTicket.createSection('VIP', 5, 1, 5);
+        await eventTicket.startSale();
+
+        await eventTicket.buyTicket(0, {value: 1});
+
+        await eventTicket.returnTicket(0);
+
+        const tickets = await eventTicket.getTickets();
+        const sections = await eventTicket.getSections();
+
+        assert.equal(tickets.length, 1, 'Ticket should be available but blocked');
+        assert.equal(tickets[0].blocked, true, 'Ticket should be blocked');
+        assert.equal(sections[0].num_tickets, 5, 'Available tickets should be increased');
+        assert.equal(sections[0].sold, 0, 'Sold tickets should be decreased');
+    });
+
+    it('should return multiple tickets', async () => {
+        const eventTicket = await EventTicket.new('Test Event');
+
+        await eventTicket.createSection('VIP', 5, 1, 5);
+        await eventTicket.startSale();
+
+        await eventTicket.buyTicket(0, {value: 1});
+        await eventTicket.buyTicket(0, {value: 1});
+        await eventTicket.buyTicket(0, {value: 1});
+
+        await eventTicket.returnTicket(0);
+        await eventTicket.returnTicket(2);
+
+        const tickets = await eventTicket.getTickets();
+        const sections = await eventTicket.getSections();
+
+        assert.equal(tickets.length, 1, 'Ticket should be available but blocked');
+        assert.equal(tickets[0].blocked, true, 'Ticket should be blocked');
+        assert.equal(tickets[1].blocked, false, 'Ticket should be blocked');
+        assert.equal(tickets[2].blocked, true, 'Ticket should be blocked');
+        assert.equal(sections[0].num_tickets, 5, 'Available tickets should be increased');
+        assert.equal(sections[0].sold, 0, 'Sold tickets should be decreased');
+    });
+
+    it('should not return a ticket that is not ones own', async () => {
+        const eventTicket = await EventTicket.new('Test Event');
+
+        await eventTicket.createSection('VIP', 5, 1, 5);
+        await eventTicket.startSale();
+
+        await eventTicket.buyTicketForOtherPerson(0, '0x78731D3Ca6b7E34aC0F824c42a7cC18A495cabaB', {value:1});
+
+        try {
+            await eventTicket.returnTicket(0);
+            assert.fail('Should have thrown an exception');
+        } catch (error) {
+            const tickets = await eventTicket.getTickets();
+            const sections = await eventTicket.getSections();
+
+            assert.equal(tickets.length, 1, 'Ticket should be available and not blocked');
+            assert.equal(tickets[0].blocked, false, 'Ticket should be blocked');
+            assert.equal(sections[0].num_tickets, 4, 'Available tickets should be the same');
+            assert.equal(sections[0].sold, 1, 'Sold tickets should be the same');
+        }
+    });
+
+    it('should not return a ticket that is not ones own', async () => {
+        const eventTicket = await EventTicket.new('Test Event');
+
+        await eventTicket.createSection('VIP', 5, 1, 5);
+        await eventTicket.startSale();
+
+        await eventTicket.buyTicketForOtherPerson(0, '0x78731D3Ca6b7E34aC0F824c42a7cC18A495cabaB', {value:1});
+
+        try {
+            await eventTicket.returnTicket(0);
+            assert.fail('Should have thrown an exception');
+        } catch (error) {
+            const tickets = await eventTicket.getTickets();
+            const sections = await eventTicket.getSections();
+
+            assert.equal(tickets.length, 1, 'Ticket should be available and not blocked');
+            assert.equal(tickets[0].blocked, false, 'Ticket should not be blocked');
+            assert.equal(sections[0].num_tickets, 4, 'Available tickets should be the same');
+            assert.equal(sections[0].sold, 1, 'Sold tickets should be the same');
+        }
+    });
+
+    it('should not return a ticket when sale is over', async () => {
+        const eventTicket = await EventTicket.new('Test Event');
+
+        await eventTicket.createSection('VIP', 5, 1, 5);
+
+        await eventTicket.startSale();
+        await eventTicket.buyTicket(0, {value:1});
+
+        await eventTicket.endSale();
+
+        try {
+            await eventTicket.returnTicket(0);
+            assert.fail('Should have thrown an exception');
+        } catch (error) {
+            const tickets = await eventTicket.getTickets();
+            const sections = await eventTicket.getSections();
+
+            assert.equal(tickets.length, 1, 'Ticket should be available and not blocked');
+            assert.equal(tickets[0].blocked, false, 'Ticket should not be blocked');
+            assert.equal(sections[0].num_tickets, 4, 'Available tickets should be the same');
+            assert.equal(sections[0].sold, 1, 'Sold tickets should be the same');
+        }
+    });
+
+    it('should not return a ticket with unvalid ID', async () => {
+        const eventTicket = await EventTicket.new('Test Event');
+
+        await eventTicket.createSection('VIP', 5, 1, 5);
+
+        await eventTicket.startSale();
+        await eventTicket.buyTicket(0, {value:1});
+
+        await eventTicket.endSale();
+
+        try {
+            await eventTicket.returnTicket(50);
+            assert.fail('Should have thrown an exception');
+        } catch (error) {
+            const tickets = await eventTicket.getTickets();
+            const sections = await eventTicket.getSections();
+
+            assert.equal(tickets.length, 1, 'Ticket should be available and not blocked');
+            assert.equal(tickets[0].blocked, false, 'Ticket should not be blocked');
+            assert.equal(sections[0].num_tickets, 4, 'Available tickets should be the same');
+            assert.equal(sections[0].sold, 1, 'Sold tickets should be the same');
+        }
+    });
+
+    it('should not return a ticket with unvalid ID', async () => {
+        const eventTicket = await EventTicket.new('Test Event');
+
+        await eventTicket.createSection('VIP', 5, 1, 5);
+
+        await eventTicket.startSale();
+        await eventTicket.buyTicket(0, {value:1});
+
+        await eventTicket.endSale();
+
+        try {
+            await eventTicket.returnTicket(50);
+            assert.fail('Should have thrown an exception');
+        } catch (error) {
+            const tickets = await eventTicket.getTickets();
+            const sections = await eventTicket.getSections();
+
+            assert.equal(tickets.length, 1, 'Ticket should be available and not blocked');
+            assert.equal(tickets[0].blocked, false, 'Ticket should not be blocked');
+            assert.equal(sections[0].num_tickets, 4, 'Available tickets should be the same');
+            assert.equal(sections[0].sold, 1, 'Sold tickets should be the same');
+        }
+    });
+
+    it('should not return a ticket twice', async () => {
+        const eventTicket = await EventTicket.new('Test Event');
+
+        await eventTicket.createSection('VIP', 5, 1, 5);
+        await eventTicket.startSale();
+        await eventTicket.buyTicket(0, {value:1});
+        await eventTicket.endSale();
+        await eventTicket.returnTicket(0);
+
+        try {
+            await eventTicket.returnTicket(0);
+            assert.fail('Should have thrown an exception');
+        } catch (error) {
+            const tickets = await eventTicket.getTickets();
+            const sections = await eventTicket.getSections();
+
+            assert.equal(tickets.length, 1, 'Ticket should be available and blocked');
+            assert.equal(tickets[0].blocked, true, 'Ticket should be blocked');
+            assert.equal(sections[0].num_tickets, 4, 'Available tickets should be the same');
+            assert.equal(sections[0].sold, 1, 'Sold tickets should be the same');
+        }
+    });
+
+    it('should not return after being used', async () => {
+        const eventTicket = await EventTicket.new('Test Event');
+
+        await eventTicket.createSection('VIP', 5, 1, 5);
+        await eventTicket.startSale();
+        await eventTicket.buyTicket(0, {value:1});
+        await eventTicket.endSale();
+        await eventTicket.checkIn(0);
+
+        try {
+            await eventTicket.returnTicket(0);
+            assert.fail('Should have thrown an exception');
+        } catch (error) {
+            const tickets = await eventTicket.getTickets();
+            const sections = await eventTicket.getSections();
+
+            assert.equal(tickets.length, 1, 'Ticket should be available and used');
+            assert.equal(tickets[0].blocked, false, 'Ticket should not be blocked');
+            assert.equal(tickets[0].used, true, 'Ticket should be used');
+            assert.equal(sections[0].num_tickets, 4, 'Available tickets should be the same');
+            assert.equal(sections[0].sold, 1, 'Sold tickets should be the same');
         }
     });
 });
