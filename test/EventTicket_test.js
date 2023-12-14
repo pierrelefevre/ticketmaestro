@@ -679,12 +679,38 @@ contract('EventTicket', (accounts) => {
         await eventTicket.createSection('VIP', 100, 1, 5);
         await eventTicket.startSale();
         await eventTicket.buyTicket(0, {value: 1});
+        await eventTicket.checkIn(0);
+
+        try {
+            await eventTicket.checkIn(0);
+            assert.fail('Should have thrown an exception');
+        } catch (error) {
+            const tickets = await eventTicket.getTickets();
+            const sections = await eventTicket.getSections();
+
+            assert.equal(tickets.length, 1, 'Ticket should be available and used');
+            assert.equal(tickets[0].blocked, false, 'Ticket should not be blocked');
+            assert.equal(tickets[0].used, true, 'Ticket should be used');
+            assert.equal(sections[0].num_tickets, 99, 'Available tickets should be the same');
+            assert.equal(sections[0].sold, 1, 'Sold tickets should be the same');
+        }
+    });
+
+    it('should verify a ticket', async () => {
+        const eventTicket = await EventTicket.new('Test Event');
+
+        await eventTicket.createSection('VIP', 100, 1, 5);
+        await eventTicket.startSale();
+        await eventTicket.buyTicket(0, {value: 1});
+        await eventTicket.verifyTicket(0);
 
         const tickets = await eventTicket.getTickets();
         const sections = await eventTicket.getSections();
 
-        assert.equal(tickets.length, 1, 'Ticket is not bought');
+        assert.equal(tickets.length, 1, 'Ticket should be bought');
         assert.equal(tickets[0].owner, accounts[0], 'Ticket owner should be the test contract');
+        assert.equal(tickets[0].blocked, false, 'Ticket should not be blocked');
+        assert.equal(tickets[0].used, false, 'Ticket should not be used');
         assert.equal(sections[0].num_tickets, 99, 'Available tickets should be decreased');
         assert.equal(sections[0].sold, 1, 'Sold tickets should be increased');
     });
