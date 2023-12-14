@@ -464,12 +464,12 @@ contract('EventTicket', (accounts) => {
         const tickets = await eventTicket.getTickets();
         const sections = await eventTicket.getSections();
 
-        assert.equal(tickets.length, 1, 'Ticket should be available but blocked');
+        assert.equal(tickets.length, 3, '2 tickets should be available but blocked');
         assert.equal(tickets[0].blocked, true, 'Ticket should be blocked');
         assert.equal(tickets[1].blocked, false, 'Ticket should be blocked');
         assert.equal(tickets[2].blocked, true, 'Ticket should be blocked');
-        assert.equal(sections[0].num_tickets, 5, 'Available tickets should be increased');
-        assert.equal(sections[0].sold, 0, 'Sold tickets should be decreased');
+        assert.equal(sections[0].num_tickets, 4, 'Available tickets should be increased');
+        assert.equal(sections[0].sold, 1, 'Sold tickets should be decreased');
     });
 
     it('should not return a ticket that is not ones own', async () => {
@@ -606,8 +606,8 @@ contract('EventTicket', (accounts) => {
 
             assert.equal(tickets.length, 1, 'Ticket should be available and blocked');
             assert.equal(tickets[0].blocked, true, 'Ticket should be blocked');
-            assert.equal(sections[0].num_tickets, 4, 'Available tickets should be the same');
-            assert.equal(sections[0].sold, 1, 'Sold tickets should be the same');
+            assert.equal(sections[0].num_tickets, 5, 'Available tickets should be increased');
+            assert.equal(sections[0].sold, 0, 'Sold tickets should be decreased');
         }
     });
 
@@ -669,8 +669,8 @@ contract('EventTicket', (accounts) => {
 
         assert.equal(tickets.length, 3, 'Ticket is not bought');
         assert.equal(tickets[0].owner, accounts[0], 'Ticket owner should be the test contract');
-        assert.equal(sections[0].num_tickets, 99, 'Available tickets should be decreased');
-        assert.equal(sections[0].sold, 1, 'Sold tickets should be increased');
+        assert.equal(sections[0].num_tickets, 97, 'Available tickets should be decreased');
+        assert.equal(sections[0].sold, 3, 'Sold tickets should be increased');
     });
 
     it('should not check in a ticket twice', async () => {
