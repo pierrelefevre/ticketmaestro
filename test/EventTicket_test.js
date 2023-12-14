@@ -55,6 +55,22 @@ contract('EventTicket', (accounts) => {
         assert.equal(sections[0].price, 1, 'Price is wrong');
     });
 
+    it('should not create a section during sale', async () => {
+        const eventTicket = await EventTicket.new('Test Event');
+
+        await eventTicket.createSection('VIP', 1000, 0, 10);
+
+        await eventTicket.startSale();
+
+	try {
+            await eventTicket.createSection('Category 1', 4000, 500, 4);
+            assert.fail('Should have thrown an exception');
+        } catch (error) {
+            const sections = await eventTicket.getSections();
+            assert.equal(sections.length, 0, 'Section should not be created');
+        }
+    });
+
     it('should not create a section with price less than 1', async () => {
         const eventTicket = await EventTicket.new('Test Event');
 
@@ -143,6 +159,46 @@ contract('EventTicket', (accounts) => {
         assert.equal(isOpenAfterSecondEnd, false, 'Sale should be closed');
     });
 
+    it('should not start sale twice', async () => {
+        const eventTicket = await EventTicket.new('Test Event');
+
+        await eventTicket.createSection('VIP', 100, 1, 5);
+
+        await eventTicket.startSale();
+
+        try {
+            await eventTicket.startSale();
+            assert.fail('Should have thrown an exception');
+        } catch (error) {
+            const isOpen = await eventTicket.saleOpen();
+            assert.equal(isOpen, true, 'Sale should be opened');
+        }
+    });
+
+    it('should not start sale before created section', async () => {
+        const eventTicket = await EventTicket.new('Test Event');
+
+        try {
+            await eventTicket.startSale();
+            assert.fail('Should have thrown an exception');
+        } catch (error) {
+            const isOpen = await eventTicket.saleOpen();
+            assert.equal(isOpen, true, 'Sale should be closed');
+        }
+    });
+
+    it('should not end sale before started sale', async () => {
+        const eventTicket = await EventTicket.new('Test Event');
+
+        try {
+            await eventTicket.endSale();
+            assert.fail('Should have thrown an exception');
+        } catch (error) {
+            const isOpen = await eventTicket.saleOpen();
+            assert.equal(isOpen, false, 'Sale should be closed');
+        }
+    });
+
     it('should buy one ticket', async () => {
         const eventTicket = await EventTicket.new('Test Event');
 
@@ -189,6 +245,53 @@ contract('EventTicket', (accounts) => {
         }
     });
 
+    it('should not buy a ticket of a section that is sold out', async () => {
+        const eventTicket = await EventTicket.new('Test Event');
+
+        await eventTicket.createSection('VIP', 1, 1, 5);
+        await eventTicket.startSale();
+        await eventTicket.buyTicket(0, {value: 1});
+
+        try {
+            await eventTicket.buyTicket(0, {value: 1});
+            assert.fail('Should have thrown an exception');
+        } catch (error) {
+            const tickets = await eventTicket.getTickets();
+            assert.equal(tickets.length, 1, 'Ticket should not be bought');
+        }
+    });
+
+    it('should not buy a ticket if it exceeds maximum limit', async () => {
+        const eventTicket = await EventTicket.new('Test Event');
+
+        await eventTicket.createSection('VIP', 100, 1, 1);
+        await eventTicket.startSale();
+        await eventTicket.buyTicket(0, {value: 1});
+
+        try {
+            await eventTicket.buyTicket(0, {value: 1});
+            assert.fail('Should have thrown an exception');
+        } catch (error) {
+            const tickets = await eventTicket.getTickets();
+            assert.equal(tickets.length, 1, 'Ticket should not be bought');
+        }
+    });
+
+    it('should not buy a ticket if full price is not paid', async () => {
+        const eventTicket = await EventTicket.new('Test Event');
+
+        await eventTicket.createSection('VIP', 100, 100, 1);
+        await eventTicket.startSale();
+
+        try {
+            await eventTicket.buyTicket(0, {value: 99});
+            assert.fail('Should have thrown an exception');
+        } catch (error) {
+            const tickets = await eventTicket.getTickets();
+            assert.equal(tickets.length, 0, 'Ticket should not be bought');
+        }
+    });
+
     it('should not buy a ticket before sale', async () => {
         const eventTicket = await EventTicket.new('Test Event');
 
@@ -202,24 +305,6 @@ contract('EventTicket', (accounts) => {
             assert.equal(tickets.length, 0, 'Ticket should not be bought');
         }
     });
-
-    it('should not buy a ticket when sold out', async () => {
-        const eventTicket = await EventTicket.new('Test Event');
-
-        await eventTicket.createSection('VIP', 1, 1, 1);
-        await eventTicket.startSale();
-
-        await eventTicket.buyTicket(0, {value: 1});
-
-        try {
-            await eventTicket.buyTicket(0, {value: 1});
-            assert.fail('Should have thrown an exception');
-        } catch (error) {
-            const tickets = await eventTicket.getTickets();
-            assert.equal(tickets.length, 1, 'There is only one ticket for sale');
-        }
-    });
-
 
     it('should buy a ticket for other person', async () => {
         const eventTicket = await EventTicket.new('Test Event');
@@ -261,6 +346,52 @@ contract('EventTicket', (accounts) => {
         } catch (error) {
             const tickets = await eventTicket.getTickets();
             assert.equal(tickets.length, 1, 'There is only one ticket for sale');
+        }
+    });
+
+    it('should not buy a ticket for others out of section scope', async () => {
+        const eventTicket = await EventTicket.new('Test Event');
+
+        await eventTicket.createSection('VIP', 100, 1, 5);
+        await eventTicket.startSale();
+
+        try {
+            await eventTicket.buyTicketForOtherPerson(1, '0x78731D3Ca6b7E34aC0F824c42a7cC18A495cabaB', {value: 1});
+            assert.fail('Should have thrown an exception');
+        } catch (error) {
+            const tickets = await eventTicket.getTickets();
+            assert.equal(tickets.length, 0, 'Ticket should not be bought');
+        }
+    });
+
+    it('should not buy a ticket of a section that is sold out', async () => {
+        const eventTicket = await EventTicket.new('Test Event');
+
+        await eventTicket.createSection('VIP', 1, 1, 5);
+        await eventTicket.startSale();
+        await eventTicket.buyTicketForOtherPerson(0, '0x78731D3Ca6b7E34aC0F824c42a7cC18A495cabaB', {value: 1});
+
+        try {
+            await eventTicket.buyTicket(0, '0x78731D3Ca6b7E34aC0F824c42a7cC18A495cabaB', {value: 1});
+            assert.fail('Should have thrown an exception');
+        } catch (error) {
+            const tickets = await eventTicket.getTickets();
+            assert.equal(tickets.length, 1, 'Ticket should not be bought');
+        }
+    });
+
+    it('should not buy a ticket for others if full price is not paid', async () => {
+        const eventTicket = await EventTicket.new('Test Event');
+
+        await eventTicket.createSection('VIP', 100, 100, 1);
+        await eventTicket.startSale();
+
+        try {
+            await eventTicket.buyTicketForOtherPerson(0, '0x78731D3Ca6b7E34aC0F824c42a7cC18A495cabaB', {value: 99});
+            assert.fail('Should have thrown an exception');
+        } catch (error) {
+            const tickets = await eventTicket.getTickets();
+            assert.equal(tickets.length, 0, 'Ticket should not be bought');
         }
     });
 
