@@ -1,43 +1,137 @@
 const EventTicket = artifacts.require('EventTicket');
 
 contract('EventTicket', (accounts) => {
-    it('should create a section', async () => {
+    it('should create one section', async () => {
         const eventTicket = await EventTicket.new('Test Event');
 
-        // Test one easy section
-        await eventTicket.createSection('VIP', 1000, 100, 10);
+        await eventTicket.createSection('VIP', 1000, 1, 10);
         const sections = await eventTicket.getSections();
 
         assert.equal(sections.length, 1, 'Section is not created');
         assert.equal(sections[0].name, 'VIP', 'Section name does not match');
+        assert.equal(sections[0].num_tickets, 1000, 'Num_tickets do not match');
+        assert.equal(sections[0].price, 1, 'Num_tickets do not match');
+    });
+
+    it('should create multiple sections', async () => {
+        const eventTicket = await EventTicket.new('Test Event');
+
+        await eventTicket.createSection('VIP', 1000, 1000, 2);
+        await eventTicket.createSection('Category 1', 4000, 500, 4);
+        await eventTicket.createSection('Category 2', 5000, 200, 4);
+        await eventTicket.createSection('Category 3', 10000, 75, 8);
+        await eventTicket.createSection('Category 4', 20000, 25, 10);
+
+        const sections = await eventTicket.getSections();
+
+        assert.equal(sections.length, 5, 'Section is not created');
+        assert.equal(sections[0].name, 'VIP', 'Section name does not match');
+        assert.equal(sections[0].num_tickets, 1000, 'Num_tickets do not match');
+        assert.equal(sections[0].price, 1000, 'Price do not match');
+        assert.equal(sections[1].name, 'Category 1', 'Section name does not match');
+        assert.equal(sections[1].num_tickets, 4000, 'Num_tickets do not match');
+        assert.equal(sections[1].price, 500, 'Price do not match');
+        assert.equal(sections[2].name, 'Category 2', 'Section name does not match');
+        assert.equal(sections[2].num_tickets, 5000, 'Num_tickets do not match');
+        assert.equal(sections[2].price, 200, 'Price do not match');
+        assert.equal(sections[3].name, 'Category 3', 'Section name does not match');
+        assert.equal(sections[3].num_tickets, 10000, 'Num_tickets do not match');
+        assert.equal(sections[3].price, 75, 'Price do not match');
+        assert.equal(sections[4].name, 'Category 4', 'Section name does not match');
+        assert.equal(sections[4].num_tickets, 20000, 'Num_tickets do not match');
+        assert.equal(sections[4].price, 25, 'Price do not match');
+    });
+
+    it('should create section with minimum requirements + number as string name', async () => {
+        const eventTicket = await EventTicket.new('Test Event');
 
         // Test minimum requirements + number as string
         await eventTicket.createSection('1', 1, 1, 1);
-        const updatedSections = await eventTicket.getSections();
+        const sections = await eventTicket.getSections();
 
-        assert.equal(updatedSections.length, 2, 'Section is not created');
-        assert.equal(updatedSections[1].num_tickets, 1, 'Num_tickets is wrong');
-        assert.equal(updatedSections[1].price, 1, 'Price is wrong');
+        assert.equal(sections.length, 1, 'Section is not created');
+        assert.equal(sections[0].name, '1', 'Section name does not match');
+        assert.equal(sections[0].num_tickets, 1, 'Num_tickets do not match');
+        assert.equal(sections[0].price, 1, 'Price is wrong');
     });
 
-    it('should start and end the sale', async () => {
+    it('should not create a section with price less than 1', async () => {
         const eventTicket = await EventTicket.new('Test Event');
 
-        // Check whether the sale is open before startSale
+	try {
+            await eventTicket.createSection('VIP', 1000, 0, 10);
+            assert.fail('Should have thrown an exception');
+        } catch (error) {
+            const sections = await eventTicket.getSections();
+            assert.equal(sections.length, 0, 'Section should not be created');
+        }
+    });
+
+    it('should not create a section with offered number of tickets less than 1', async () => {
+        const eventTicket = await EventTicket.new('Test Event');
+
+	try {
+            await eventTicket.createSection('VIP', 0, 1, 10);
+            assert.fail('Should have thrown an exception');
+        } catch (error) {
+            const sections = await eventTicket.getSections();
+	    assert.equal(sections.length, 0, 'Section should not be created');
+        }
+    });
+
+    it('should not create a section with maximum number of tickets less than 1', async () => {
+        const eventTicket = await EventTicket.new('Test Event');
+
+	try {
+            await eventTicket.createSection('VIP', 1000, 1, 0);
+            assert.fail('Should have thrown an exception');
+        } catch (error) {
+            const sections = await eventTicket.getSections();
+	    assert.equal(sections.length, 0, 'Section should not be created');
+        }
+    });
+
+    it('should not be sale before start', async () => {
+        const eventTicket = await EventTicket.new('Test Event');
+
         await eventTicket.createSection('VIP', 100, 1, 5);
 
-        const isOpenBeforeStart = await eventTicket.saleOpen();
-        assert.equal(isOpenBeforeStart, false, 'Sale should be closed');
+        const isOpen = await eventTicket.saleOpen();
+        assert.equal(isOpen, false, 'Sale should be closed');
+    });
 
-        // Test startSale
+    it('should start sale', async () => {
+        const eventTicket = await EventTicket.new('Test Event');
+
+        await eventTicket.createSection('VIP', 100, 1, 5);
+
         await eventTicket.startSale();
-        const isOpenAfterStart = await eventTicket.saleOpen();
-        assert.equal(isOpenAfterStart, true, 'Sale should be open');
 
-        // Test endSale
+        const isOpen = await eventTicket.saleOpen();
+        assert.equal(isOpen, true, 'Sale should be open');
+    });
+
+    it('should end sale', async () => {
+        const eventTicket = await EventTicket.new('Test Event');
+
+        await eventTicket.createSection('VIP', 100, 1, 5);
+
+        await eventTicket.startSale();
+
         await eventTicket.endSale();
-        const isOpenAfterEnd = await eventTicket.saleOpen();
-        assert.equal(isOpenAfterEnd, false, 'Sale should be closed');
+
+        const isOpen = await eventTicket.saleOpen();
+        assert.equal(isOpen, false, 'Sale should be closed');
+    });
+
+    it('should restart and reend sale', async () => {
+        const eventTicket = await EventTicket.new('Test Event');
+
+        await eventTicket.createSection('VIP', 100, 1, 5);
+
+        await eventTicket.startSale();
+
+        await eventTicket.endSale();
 
         // Test reopen openSale and endSale again        
         await eventTicket.startSale();
