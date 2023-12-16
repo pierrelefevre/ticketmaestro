@@ -45,7 +45,7 @@ The tickets are personalised and can only be used by the owner and once the owne
 (8. Tickets, if unused, can be returned by users with the 'returnTicket' function during the sale.)
 
 ## Testing
-Testing of the contract can happen using the automated tool HardHat (file EventTicket_test.js).
+Testing of the contract can happen using the automated tool HardHat (file EventTicket_test.js). There are 42 tests covering 100% of the statements in various ways.
 
 ## Progress tracking 
 View the [checklist](grading-checklist.md).
