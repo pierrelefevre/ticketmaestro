@@ -36,13 +36,13 @@ The tickets are personalised and can only be used by the owner and once the owne
 ### Getting Started
 
 1. Enter an event name and deploy the 'EventTicket' smart contract to the Ethereum blockchain.
-2. Enter a section name and call the 'createSection' as the owner function to define event sections.
-3. Start the ticket sale as an owner using the 'startSale' function.
-4. Tickets can be purchased by the user using the 'buyTicket' function or for others using the 'buyTicketForOtherPerson' function (with the address).
-5. Check in attendees as the owner using the 'checkIn' function.
-6. Check the ticket status using the 'verifyTicket' function.
-(7. End the sale as an owner using the 'endSale' function.)
-(8. Tickets, if unused, can be returned by users with the 'returnTicket' function during the sale.)
+2. Enter a section name and call the 'createSection()' as the owner function to define event sections.
+3. Start the ticket sale as an owner using the 'startSale()' function.
+4. Tickets can be purchased by the user using the 'buyTicket()' function or for others using the 'buyTicketForOtherPerson' function (with the address).
+5. Check in attendees as the owner using the 'checkIn()' function.
+6. Check the ticket status using the 'verifyTicket()' function.
+7. (End the sale as an owner using the 'endSale()' function.)
+8. (Tickets, if unused, can be returned by users with the 'returnTicket()' function during the sale.)
 
 ## Testing
 Testing of the contract can happen using the automated tool HardHat (file EventTicket_test.js). There are 42 tests covering 100% of the statements in various ways.
