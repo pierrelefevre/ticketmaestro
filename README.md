@@ -5,15 +5,11 @@ A project by Robert Scholz and Pierre Le Fevre, built in the context of the KTH 
 
 ![logo](./app/public/android-chrome-192x192.png)
 
-## Overview
-
-This smart protocol is intended to simulate a ticketing system. An owner can deploy a contract and create tickets for an event. Customers can buy them for themselves or other people. A ticket owner can also return a ticket.
-
-This ticket sale project is based on Ethereum and build with Solidity. 
-
-## Related work
-
 ## Contract breakdown
+
+This smart protocol is intended to simulate a ticketing system for an event such as the upcoming European Championship 2024 in football e.g. An owner can deploy a contract and create tickets for an event and checkin customers to an event. Customers can buy them for themselves or other people. A ticket owner can also return a ticket.
+
+This ticket sale project is based on Ethereum and build with Solidity. The EventTicket.sol file can be deployed in remix, but there is also the possibility to use MetaMask with the website https://ticket.app.cloud.cbh.kth.se/ which intends to simulate a ticket purchasing website.
 
 ## Concepts
 
@@ -27,13 +23,13 @@ Each event has one or more sections which can be seen as categories. Each sectio
 
 ### Ticket Concept
 
-Tickets are digital assets that are written into the blockchain. Each ticket has a sectionID it belongs to (the sectionID is created numerically while 0 is the oldest one created), the address of the assigned owner and a bool value that shows whether the ticket has been returned (blocked) or already used. A ticket can be returned, but only through the owner, during sale and only if it has not been returned or used. 
+Tickets are digital assets that are written into the blockchain. Each ticket has a sectionID it belongs to (the sectionID is created numerically while 0 is the oldest one created), the address of the assigned owner and a bool value that shows whether the ticket has been returned (blocked) or already used. A ticket can be returned, but only through the owner, during sale and only if it has not been returned or used. A ticket status can also be retrieved.
 
-### Ticket sale concept
+### Ticket Sale Concept
 
 The tickets can be bought for themself or for other people. Requirements for a purchase are sufficient funds, an open sale, available number of tickets and a non-reached personal ticket limit. The mint happens during the purchase.
 
-### Check in/validator concept
+### Check In/Validator Concept
 
 The tickets are personalised and can only be used by the owner and once the owner has checked in a person or a ticket owner has returned its ticket, the tickets cannot be used or returned anymore.
 
@@ -45,12 +41,14 @@ The tickets are personalised and can only be used by the owner and once the owne
 4. Tickets can be purchased by the user using the 'buyTicket' function or for others using the 'buyTicketForOtherPerson' function (with the address).
 5. Check in attendees as the owner using the 'checkIn' function.
 6. Check the ticket status using the 'verifyTicket' function.
-(7. End the sale as an owner using the 'endSale' function).
-(8. Tickets, if unused, can be returned by users with the 'returnTicket' function during the sale).
+(7. End the sale as an owner using the 'endSale' function.)
+(8. Tickets, if unused, can be returned by users with the 'returnTicket' function during the sale.)
+
+## Testing
+Testing of the contract can happen using the automated tool HardHat (file EventTicket_test.js).
 
 ## Progress tracking 
 View the [checklist](grading-checklist.md).
-
 
 ## Related work
 [AWS Managed Blockchain](https://aws.amazon.com/blogs/database/blockchain-and-the-future-of-event-ticketing/)
