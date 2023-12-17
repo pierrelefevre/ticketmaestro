@@ -15,7 +15,9 @@ export const EventsContext = createContext({
 export const EventsContextProvider = ({ children }) => {
   const [events, setEvents] = useState([]);
   const [tickets, setTickets] = useState([]);
+  const [rTickets, setRTickets] = useState([]); // [
   const [owned, setOwned] = useState([]);
+  const [rOwned, setROwned] = useState([]);
 
   const fetchEvents = async () => {
     fetch("https://api.ticketmaestro.fun/events")
@@ -23,6 +25,9 @@ export const EventsContextProvider = ({ children }) => {
         return response.json();
       })
       .then((e) => {
+        e.events.sort((a, b) => {
+          return new Date(a.date) < new Date(b.date);
+        });
         setEvents(e.events);
       });
   };
@@ -35,7 +40,7 @@ export const EventsContextProvider = ({ children }) => {
       let contract = await getContract(address);
       let t = await contract.getTickets();
 
-      let existing = tickets.find(
+      let existing = rTickets.find(
         (ticket) => ticket.event.contractAddress === address
       );
 
@@ -57,10 +62,12 @@ export const EventsContextProvider = ({ children }) => {
         ids: ids.sort(),
       };
 
-      setTickets([
-        ...tickets.filter((t) => t.event.contractAddress !== address),
-        tick,
-      ]);
+      if (tick.ids.length > 0) {
+        setRTickets([
+          ...rTickets.filter((t) => t.event.contractAddress !== address),
+          tick,
+        ]);
+      }
     });
   };
 
@@ -73,9 +80,9 @@ export const EventsContextProvider = ({ children }) => {
 
       let owner = await contract.owner();
 
-      if (owner === wallet && !owned.includes(event)) {
-        setOwned([
-          ...owned.filter((o) => o.contractAddress !== event.contractAddress),
+      if (owner === wallet && !rOwned.includes(event)) {
+        setROwned([
+          ...rOwned.filter((o) => o.contractAddress !== event.contractAddress),
           event,
         ]);
       }
@@ -96,6 +103,32 @@ export const EventsContextProvider = ({ children }) => {
   useInterval(() => {
     refresh();
   }, 1000);
+
+  useEffect(() => {
+    if (rTickets.length < 2) return;
+
+    let newTickets = rTickets;
+
+    newTickets.sort((a, b) => {
+      return new Date(a.event.date) - new Date(b.event.date);
+    });
+
+    setTickets(newTickets);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [rTickets]);
+
+  useEffect(() => {
+    if (rOwned.length < 2) return;
+
+    let newOwned = rOwned;
+
+    newOwned.sort((a, b) => {
+      return new Date(a.date) - new Date(b.date);
+    });
+
+    setOwned(newOwned);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [rOwned]);
 
   return (
     <EventsContext.Provider
