@@ -1,12 +1,22 @@
 {
     "events": [
         {
-            "contractAddress": "0x98C052036B69129E6007b50136b3DaA6E9A8c7a4",
-            "name": "Taylor Swift Stockholm",
-            "imageUrl": "https://wallpaper-of-the-day.app.cloud.cbh.kth.se/",
+            "contractAddress": "0x6322a69c911BF0246104C50445bb112a87bF04a4",
+            "name": "Taylor Swift",
+            "imageUrl": "https://madmuseum.org/sites/default/files/styles/page_hero/public/2023/04/IBYTAM_still-page.jpg?itok=cVPWukbf",
             "description": "Taylor swift is coming to town!",
+            "location": "Stockholm, Sweden",
+            "date": "2023-12-24T23:00:00.000Z"
+        },
+        {
+            "contractAddress": "0x1A66Bd6E58BD80bfbb347dC83fA8C7CD6849DC01",
+            "name": "Elton John",
+            "imageUrl": "https://ew.com/thmb/IhYw6fGLY4iquDogafLzZXKy2qc=/1500x0/filters:no_upscale():max_bytes(150000):strip_icc()/GettyImages-1206593969-7113c253e3ea491bad16e925f121f48e.jpg",
+            "description": "Rocket man is coming to town!",
             "location": "Stockholm, Sweden",
             "date": "2023-12-24T23:00:00.000Z"
         }
     ]
 }
+
+
