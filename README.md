@@ -9,7 +9,7 @@ A project by Robert Scholz and Pierre Le Fevre, built in the context of the KTH 
 
 This smart protocol is intended to simulate a ticketing system for an event such as the upcoming European Championship 2024 in football e.g. An owner can deploy a contract and create tickets for an event and checkin customers to an event. Customers can buy them for themselves or other people. A ticket owner can also return a ticket.
 
-This ticket sale project is based on Ethereum and build with Solidity. The EventTicket.sol file can be deployed in remix, but there is also the possibility to use MetaMask with the website https://ticket.app.cloud.cbh.kth.se/ which intends to simulate a ticket purchasing website.
+This ticket sale project is based on Ethereum and build with Solidity. The EventTicket.sol file can be deployed in remix, but there is also the possibility to use MetaMask with the website [https://ticket.app.cloud.cbh.kth.se/ ](https://ticketmaestro.fun/) which intends to simulate a ticket purchasing website.
 
 ## Concepts
 
